@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+<style>
+#map{
+    height:200px;
+}
+</style>
+
+<div id='map'></div>
+
+<script>
+var map = L.map('map').setView([51.505, -0.09], 6);
+
+L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+{% for pin in pin_list %}
+L.marker([{{pin.lat}}, {{pin.lng}}]).addTo(map)
+    .bindPopup("{{pin.text|escapejs}}");
+{% endfor %}
+</script>
+
+
+<form method='post' action='' id='marker-form'>
+    {% csrf_token %}
+    <p>
+        <textarea name='text'></textarea>
+    </p>
+    <input type='hidden' name='lat' value='0'/>
+    <input type='hidden' name='lng' value='0'/>
+    <input type='submit' value='Add marker'/>
+</form>
+
+<script>
+var form = $('#marker-form');
+var lat_input = $('input[name="lat"]');
+var lng_input = $('input[name="lng"]');
+
+form.hide();
+
+var current_marker = null;
+
+map.off('click');
+map.on('click', function(e){
+    if(current_marker != null){
+        map.removeLayer(current_marker);
+    }
+    current_marker = L.marker(e.latlng);
+    current_marker.addTo(map);
+    lat_input.val(current_marker.getLatLng().lat);
+    lng_input.val(current_marker.getLatLng().lng);
+    form.show()
+});
+
+</script>
+
+{% endblock %}
