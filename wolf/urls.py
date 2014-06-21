@@ -5,6 +5,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^$', 'places.views.map', name='home'),
-
+    url('', include('social.apps.django_app.urls', namespace='social')),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^logout/$', 'django.contrib.auth.views.logout', { 'next_page':"/" }),
 )
