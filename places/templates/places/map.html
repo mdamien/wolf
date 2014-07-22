@@ -5,21 +5,32 @@
 
 {% block body %}
 <style>
-body{
-    width:400px;
-    margin:auto;
-    padding-top:100px;
+#map, body, html{
+    height:100%;
 }
-#map{
-    height:320px;
+.login {
+    position: absolute;
+    right: 0;
+    z-index: 10;
+    background: rgba(197, 197, 197, 0.77);
+}
+.form {
+    position: absolute;
+    top: 0;
+    background: rgba(150, 150, 150, 0.78);
+    height: 100%;
+    width: 100%;
+    padding: 20%;
 }
 </style>
 
+<div class='login'>
 {% if user.is_authenticated %}
 Logged as {{ user }}, <a href="{% url 'django.contrib.auth.views.logout' %}">Logout</a>
 {% else %}
     <a href="{% url 'social:begin' "google-oauth2" %}?next=/">Login with Google</a>
 {% endif %}
+</div>
 
 <div id='map'></div>
 
@@ -47,6 +58,7 @@ L.circleMarker([{{pin.lat}}, {{pin.lng}}],{
 {% endfor %}
 </script>
 
+<div class='form' style='display:none'>
 {% if user.is_authenticated %}
 <form method='post' action='' id='marker-form'>
     {% csrf_token %}
@@ -62,11 +74,13 @@ L.circleMarker([{{pin.lat}}, {{pin.lng}}],{
     </p>
     <input type='hidden' name='lat' value='0'/>
     <input type='hidden' name='lng' value='0'/>
+    <input type='submit' value='Cancel' onclick='$(".form").fadeOut(); return false;' />
     <input type='submit' value='Add marker'/>
 </form>
+</div>
 
 <script>
-var form = $('#marker-form');
+var form = $('.form');
 var lat_input = $('input[name="lat"]');
 var lng_input = $('input[name="lng"]');
 
@@ -83,7 +97,7 @@ map.on('click', function(e){
     current_marker.addTo(map);
     lat_input.val(current_marker.getLatLng().lat);
     lng_input.val(current_marker.getLatLng().lng);
-    form.show()
+    form.fadeIn()
 });
 
 </script>
