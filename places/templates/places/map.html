@@ -14,13 +14,22 @@
     z-index: 10;
     background: rgba(197, 197, 197, 0.77);
 }
-.form {
+.form, .comments {
     position: absolute;
     top: 0;
     background: rgba(150, 150, 150, 0.78);
     height: 100%;
     width: 100%;
     padding: 20%;
+}
+.comments {
+        background: white;
+        padding:0;
+}
+#disqus_thread, .wrap {
+        max-width:400px;
+        margin:auto;
+        margin-top:20px;
 }
 </style>
 
@@ -47,6 +56,7 @@ L.circleMarker([{{pin.lat}}, {{pin.lng}}],{
         'fillColor':'{{pin.category.color}}',
     }).addTo(map)
 .bindPopup("{{pin.category.name}}</br>{{pin.text|escapejs}} - {{pin.created_on|naturaltime}}"
+        +"<br/><a href='javascript:void(0)' onclick='showComments({{pin.pk}})'>Comments</a>"
     {% if pin.user == user %}
         +"<form method='post' action=''>"
         +"{% csrf_token %}"
@@ -79,6 +89,24 @@ L.circleMarker([{{pin.lat}}, {{pin.lng}}],{
 </form>
 </div>
 
+<div class='comments' style='display:none'>
+    <div class='wrap'>
+        <input type='submit' value='back' onclick='$(".comments").fadeOut(); return false;' />
+    </div>
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'where-wolf'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+</div>
+
 <script>
 var form = $('.form');
 var lat_input = $('input[name="lat"]');
@@ -99,6 +127,20 @@ map.on('click', function(e){
     lng_input.val(current_marker.getLatLng().lng);
     form.fadeIn()
 });
+
+function showComments(id){
+/*   $('.comments').html(""
+ +'<div id="disqus_thread"></div>'
+ +'<script type="text/javascript">'
+ +"var disqus_shortname = 'where-wolf'; // required: replace example with your forum shortname"
+ +"(function() {"
+ +"           var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;"
+ +"           dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';"
+ +"           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);"
+ +"       })();</"+"script>");
+*/
+   $(".comments").fadeIn();
+}
 
 </script>
 {% endif %}
